@@ -13,6 +13,12 @@ public class playerControllerLoseHeight : MonoBehaviour
     public GameObject TryAgainObject;
     public int winNumber = 10;
     public float loseHeight = -19f;
+    public float ImpactVolume = .5f;
+    public float ImpactVolumeThreshold = 1f;
+    public AudioClip Impact;
+    public float pickUpVolume = .5f;
+    public AudioClip pickUp;
+    private AudioSource thisAudioSource;
     private int count = 0;
     private Rigidbody rb;
     private float movementX;
@@ -24,6 +30,9 @@ public class playerControllerLoseHeight : MonoBehaviour
         SetCountText();
         winTextObject.SetActive(false);
         TryAgainObject.SetActive(false);
+       
+        thisAudioSource = transform.GetComponent<AudioSource>();
+        
     }
 
     void OnMove(InputValue movementValue)
@@ -57,7 +66,21 @@ public class playerControllerLoseHeight : MonoBehaviour
             other.gameObject.SetActive(false);
             count += 1;
 
+
+            thisAudioSource.volume = pickUpVolume;
+            thisAudioSource.PlayOneShot(pickUp);
+
             SetCountText();
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        float collisionForce = collision.impulse.magnitude / Time.fixedDeltaTime;
+        if (collisionForce > ImpactVolumeThreshold)
+        {
+            thisAudioSource.volume = ImpactVolume;
+            thisAudioSource.PlayOneShot(Impact);
         }
     }
 
